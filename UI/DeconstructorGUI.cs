@@ -18,7 +18,7 @@ namespace TheDeconstructor.UI
 	{
 		//internal Dictionary<int, DeconEntityInstance> TEInstances = new Dictionary<int, DeconEntityInstance>();
 		//internal int? currentInstance = null;
-		internal Point16? currentTEPosition = null;
+		internal int currentEntityID = -1;
 		internal bool visible = false;
 		internal bool dragging = false;
 		private Vector2 offset;
@@ -122,16 +122,14 @@ namespace TheDeconstructor.UI
 
 		private void CloseButton_OnClick(UIMouseEvent evt, UIElement listeningElement)
 		{
-			if (currentTEPosition.HasValue)
+			if (currentEntityID != -1
+				&& TileEntity.ByID.ContainsKey(currentEntityID))
 			{
-				int id = TheDeconstructor.instance.GetTileEntity<DeconstructorTE>().Find(currentTEPosition.Value.X, currentTEPosition.Value.Y);
-				if (id != 1)
-				{
-					DeconstructorTE TE = (DeconstructorTE)TileEntity.ByID[id];
-					TE?.UpdateIsOpened(false);
-				}
+				DeconstructorTE TE = TileEntity.ByID[currentEntityID] as DeconstructorTE;
+				TE.RelinquishOwnership(Main.myPlayer);
 			}
 			TheDeconstructor.instance.TryToggleGUI(false);
+			currentEntityID = -1;
 		}
 
 		private void BasePanel_OnMouseUp(UIMouseEvent evt, UIElement listeningElement)
@@ -239,9 +237,9 @@ namespace TheDeconstructor.UI
 			}
 		}
 
-		public void ToggleUI(bool on = true)
+		public void ToggleUI(bool state = true)
 		{
-			if (!on)
+			if (!state)
 			{
 				recipeList.Clear();
 				TryGetCube();
@@ -257,24 +255,24 @@ namespace TheDeconstructor.UI
 		{
 			base.Update(gameTime);
 
-			if (currentTEPosition == null)
-				return;
+			//if (currentTEPosition == null)
+			//	return;
 
-			// Get tile entity from tile data (top left 0, 0 frame of tile)
-			int id = TheDeconstructor.instance.GetTileEntity<DeconstructorTE>().Find(currentTEPosition.Value.X, currentTEPosition.Value.Y);
-			if (id != 1)
-			{
-				DeconstructorTE TE = (DeconstructorTE)TileEntity.ByID[id];
-				// Close UI if too far from tile
-				if (
-					Math.Abs(TE.playerDistances[Main.myPlayer].X) > 12f * 16f
-					|| Math.Abs(TE.playerDistances[Main.myPlayer].Y) > 12f * 16f
-					|| Main.LocalPlayer.dead || Main.gameMenu)
-				{
-					TheDeconstructor.instance.TryToggleGUI(false);
-					TE.UpdateIsOpened(false);
-				}
-			}
+			//// Get tile entity from tile data (top left 0, 0 frame of tile)
+			//int id = TheDeconstructor.instance.GetTileEntity<DeconstructorTE>().Find(currentTEPosition.Value.X, currentTEPosition.Value.Y);
+			//if (id != 1)
+			//{
+			//	DeconstructorTE TE = (DeconstructorTE)TileEntity.ByID[id];
+			//	// Close UI if too far from tile
+			//	if (
+			//		Math.Abs(TE.playerDistances[Main.myPlayer].X) > 12f * 16f
+			//		|| Math.Abs(TE.playerDistances[Main.myPlayer].Y) > 12f * 16f
+			//		|| Main.LocalPlayer.dead || Main.gameMenu)
+			//	{
+			//		TheDeconstructor.instance.TryToggleGUI(false);
+			//		TE.UpdateIsOpened(false);
+			//	}
+			//}
 		}
 
 		internal static class RecipeSearcher

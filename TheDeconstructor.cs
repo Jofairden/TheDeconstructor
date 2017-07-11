@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
+using Terraria.Net;
 using Terraria.UI;
 using TheDeconstructor.Tiles;
 using TheDeconstructor.UI;
@@ -68,10 +69,9 @@ namespace TheDeconstructor
 		/// <summary>
 		/// Try toggling our UI
 		/// </summary>
-		internal void TryToggleGUI(bool? state = null)
+		public void TryToggleGUI(bool state)
 		{
-			bool visible =
-				state ?? !deconGUI.visible;
+			bool visible = state;
 
 			SoundHelper.PlaySound(
 				visible
@@ -81,5 +81,62 @@ namespace TheDeconstructor
 			deconGUI.visible = visible;
 			deconGUI.ToggleUI(visible);
 		}
+
+		public override void HandlePacket(BinaryReader reader, int whoAmI)
+		{
+			ModPacketType type = (ModPacketType)reader.ReadInt32();
+
+			if (type == ModPacketType.RequestOwnership)
+			{
+				int ID = reader.ReadInt32();
+				if (TileEntity.ByID.ContainsKey(ID))
+				{
+					DeconstructorTE TE = (DeconstructorTE)TileEntity.ByID[ID];
+
+					if (TE.playerWhoAmI == -1)
+					{
+						TE.playerWhoAmI = reader.ReadInt32();
+
+						var packet = GetPacket();
+						packet.Write((int)ModPacketType.GrantOwnership);
+						packet.Send(TE.playerWhoAmI);
+					}
+				}
+			}
+			else if (type == ModPacketType.RelinquishOwnership)
+			{
+				int ID = reader.ReadInt32();
+				if (TileEntity.ByID.ContainsKey(ID))
+				{
+					DeconstructorTE TE = (DeconstructorTE) TileEntity.ByID[ID];
+					int owner = reader.ReadInt32();
+					if (TE.playerWhoAmI == owner)
+					{
+						TE.playerWhoAmI = -1;
+
+						var packet = GetPacket();
+						packet.Write((int)ModPacketType.TakeOwnership);
+						packet.Send(owner);
+					}
+				}
+			}
+			else if (type == ModPacketType.GrantOwnership)
+			{
+				TryToggleGUI(true);
+			}
+			else if (type == ModPacketType.TakeOwnership)
+			{
+				TryToggleGUI(false);
+			}
+		}
+	}
+
+
+	public enum ModPacketType
+	{
+		RequestOwnership,
+		RelinquishOwnership,
+		GrantOwnership,
+		TakeOwnership
 	}
 }
