@@ -13,7 +13,7 @@ namespace TheDeconstructor.Items
 		{
 			base.SetStaticDefaults();
 			DisplayName.SetDefault("Lunar Deconsructor");
-			Tooltip.SetDefault("Can seal an item to return it to it's former state, for a price" +
+			Tooltip.SetDefault("Can seal an item to return it to its former state, for a price" +
 							   "\nMaterials will be put into a sealed Lunar Cube");
 		}
 
@@ -46,12 +46,27 @@ namespace TheDeconstructor.Items
 		public override void AddRecipes()
 		{
 			var recipe = new ModRecipe(mod);
-			recipe.AddIngredient(ItemID.FragmentSolar, 10);
-			recipe.AddIngredient(ItemID.FragmentNebula, 10);
-			recipe.AddIngredient(ItemID.FragmentStardust, 10);
-			recipe.AddIngredient(ItemID.FragmentVortex, 10);
-			recipe.AddIngredient(ItemID.LunarBar, 10);
-			recipe.AddTile(412);
+
+			// Old recipe
+			//recipe.AddIngredient(ItemID.FragmentSolar, 10);
+			//recipe.AddIngredient(ItemID.FragmentNebula, 10);
+			//recipe.AddIngredient(ItemID.FragmentStardust, 10);
+			//recipe.AddIngredient(ItemID.FragmentVortex, 10);
+			//recipe.AddIngredient(ItemID.LunarBar, 10);
+			//recipe.AddTile(412);
+
+			const int barAmount = 2;
+			// New recipe
+			recipe.AddIngredient(ItemID.CobaltBar, barAmount);
+			recipe.AddIngredient(ItemID.PalladiumBar, barAmount);
+			recipe.AddIngredient(ItemID.AdamantiteBar, barAmount);
+			recipe.AddIngredient(ItemID.MythrilBar, barAmount);
+			recipe.AddIngredient(ItemID.OrichalcumBar, barAmount);
+			recipe.AddIngredient(ItemID.TitaniumBar, barAmount);
+			recipe.AddIngredient(ItemID.HallowedBar, barAmount);
+			recipe.AddIngredient(ItemID.FallenStar, 10);
+			recipe.AddTile(TileID.DemonAltar);
+
 			recipe.SetResult(this);
 			recipe.AddRecipe();
 		}

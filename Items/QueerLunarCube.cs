@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 
@@ -30,9 +31,20 @@ namespace TheDeconstructor.Items
 		public override void AddRecipes()
 		{
 			var recipe = new ModRecipe(mod);
-			recipe.AddRecipeGroup("Fragment");
-			recipe.AddIngredient(mod.ItemType<LunarCube>(), 1);
+
+			// Old recipe
+			//recipe.AddRecipeGroup("Fragment");
+			//recipe.AddIngredient(mod.ItemType<LunarCube>(), 1);
+			//recipe.AddTile(mod.TileType<Tiles.Deconstructor>());
+
+			// New recipe
+			recipe.AddIngredient(mod.ItemType<LunarCube>());
+			recipe.AddIngredient(ItemID.SoulofMight);
+			recipe.AddIngredient(ItemID.SoulofSight);
+			recipe.AddIngredient(ItemID.SoulofFright);
+			recipe.AddIngredient(ItemID.FallenStar);
 			recipe.AddTile(mod.TileType<Tiles.Deconstructor>());
+
 			recipe.SetResult(this);
 			recipe.AddRecipe();
 		}

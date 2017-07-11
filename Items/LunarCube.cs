@@ -21,9 +21,18 @@ namespace TheDeconstructor.Items
 		public override void AddRecipes()
 		{
 			var recipe = new ModRecipe(mod);
-			recipe.AddRecipeGroup("Fragment");
-			recipe.AddIngredient(ItemID.LunarBar);
+
+			// Old recipe
+			//recipe.AddRecipeGroup("Fragment");
+			//recipe.AddIngredient(ItemID.LunarBar);
+			//recipe.AddTile(mod.TileType<Tiles.Deconstructor>());
+
+			// New recipe
+			recipe.AddIngredient(ItemID.SoulofLight);
+			recipe.AddIngredient(ItemID.SoulofNight);
+			recipe.AddIngredient(ItemID.FallenStar);
 			recipe.AddTile(mod.TileType<Tiles.Deconstructor>());
+
 			recipe.SetResult(this);
 			recipe.AddRecipe();
 		}

@@ -14,31 +14,6 @@ using TheDeconstructor.Tiles;
 
 namespace TheDeconstructor.UI
 {
-	//internal sealed class DeconEntityInstance : DeconInstance
-	//{
-	//	public Item sourceItem;
-	//	public Item cubeItem;
-
-	//	public DeconEntityInstance(int id, int? player = null, Item source = null, Item cube = null) : base(id, player)
-	//	{
-	//		sourceItem = source ?? new Item();
-	//		cubeItem = cube ?? new Item();
-	//	}
-	//}
-
-	//internal abstract class DeconInstance
-	//{
-	//	public bool justUpdated = false;
-	//	public int? requestedPlayerID;
-	//	public int? ID;
-
-	//	protected DeconInstance(int id, int? player)
-	//	{
-	//		ID = id;
-	//		requestedPlayerID = player;
-	//	}
-	//}
-
 	internal sealed class DeconstructorGUI : UIState
 	{
 		//internal Dictionary<int, DeconEntityInstance> TEInstances = new Dictionary<int, DeconEntityInstance>();
@@ -147,6 +122,15 @@ namespace TheDeconstructor.UI
 
 		private void CloseButton_OnClick(UIMouseEvent evt, UIElement listeningElement)
 		{
+			if (currentTEPosition.HasValue)
+			{
+				int id = TheDeconstructor.instance.GetTileEntity<DeconstructorTE>().Find(currentTEPosition.Value.X, currentTEPosition.Value.Y);
+				if (id != 1)
+				{
+					DeconstructorTE TE = (DeconstructorTE)TileEntity.ByID[id];
+					TE?.UpdateIsOpened(false);
+				}
+			}
 			TheDeconstructor.instance.TryToggleGUI(false);
 		}
 
@@ -273,46 +257,23 @@ namespace TheDeconstructor.UI
 		{
 			base.Update(gameTime);
 
-			//if (currentInstance != null)
-			//{
-			//	var instance = TEInstances[currentInstance.Value];
-			//	if (!instance.justUpdated)
-			//	{
-			//		bool b = false;
-			//		if (sourceItemPanel.item != instance.sourceItem)
-			//		{
-			//			instance.sourceItem = sourceItemPanel.item.Clone();
-			//			b = true;
-			//		}
-			//		if (cubeItemPanel.item != instance.cubeItem)
-			//		{
-			//			instance.cubeItem = cubeItemPanel.item.Clone();
-			//			b = true;
-			//		}
-
-			//		instance.justUpdated = b;
-			//	}
-			//	else
-			//		instance.justUpdated = false;
-
-			//	sourceItemPanel.BindItem(instance);
-			//	cubeItemPanel.BindItem(instance);
-			//}
-
 			if (currentTEPosition == null)
 				return;
 
 			// Get tile entity from tile data (top left 0, 0 frame of tile)
-			var TE = TileEntity.ByPosition[currentTEPosition.Value] as DeconstructorTE;
-			// Close UI if too far from tile
-			if (
-				Math.Abs(TE.playerDistances[Main.myPlayer].X) > 12f * 16f
-				|| Math.Abs(TE.playerDistances[Main.myPlayer].Y) > 12f * 16f
-				|| Main.LocalPlayer.dead || Main.gameMenu)
+			int id = TheDeconstructor.instance.GetTileEntity<DeconstructorTE>().Find(currentTEPosition.Value.X, currentTEPosition.Value.Y);
+			if (id != 1)
 			{
-				//TE.isCurrentlyActive = false;
-				//TE.player = -1;
-				TheDeconstructor.instance.TryToggleGUI(false);
+				DeconstructorTE TE = (DeconstructorTE)TileEntity.ByID[id];
+				// Close UI if too far from tile
+				if (
+					Math.Abs(TE.playerDistances[Main.myPlayer].X) > 12f * 16f
+					|| Math.Abs(TE.playerDistances[Main.myPlayer].Y) > 12f * 16f
+					|| Main.LocalPlayer.dead || Main.gameMenu)
+				{
+					TheDeconstructor.instance.TryToggleGUI(false);
+					TE.UpdateIsOpened(false);
+				}
 			}
 		}
 
